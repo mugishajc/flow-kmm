@@ -39,4 +39,5 @@ DerivedData/
 *.log
 *.tmp
 *.swp
-.env
+config.bat
+node_modules
