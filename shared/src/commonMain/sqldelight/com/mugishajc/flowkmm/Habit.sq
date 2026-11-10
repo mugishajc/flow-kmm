@@ -1,0 +1,63 @@
+CREATE TABLE HabitEntity (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL DEFAULT '',
+    frequency TEXT NOT NULL DEFAULT 'DAILY',
+    target_count INTEGER NOT NULL DEFAULT 1,
+    color TEXT NOT NULL DEFAULT '#4A90D9',
+    created_at TEXT NOT NULL,
+    archived INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE HabitEntryEntity (
+    id TEXT NOT NULL PRIMARY KEY,
+    habit_id TEXT NOT NULL,
+    date TEXT NOT NULL,
+    count INTEGER NOT NULL DEFAULT 1,
+    note TEXT,
+    FOREIGN KEY (habit_id) REFERENCES HabitEntity(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_entry_habit_id ON HabitEntryEntity(habit_id);
+CREATE INDEX idx_entry_date ON HabitEntryEntity(date);
+CREATE INDEX idx_entry_habit_date ON HabitEntryEntity(habit_id, date);
+
+-- Habit queries
+selectAllHabits:
+SELECT * FROM HabitEntity ORDER BY created_at DESC;
+
+selectHabitById:
+SELECT * FROM HabitEntity WHERE id = ?;
+
+insertHabit:
+INSERT OR REPLACE INTO HabitEntity(id, name, description, frequency, target_count, color, created_at, archived)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+updateHabit:
+UPDATE HabitEntity SET
+    name = ?,
+    description = ?,
+    frequency = ?,
+    target_count = ?,
+    color = ?,
+    archived = ?
+WHERE id = ?;
+
+deleteHabit:
+DELETE FROM HabitEntity WHERE id = ?;
+
+-- Entry queries
+selectEntriesForHabit:
+SELECT * FROM HabitEntryEntity WHERE habit_id = ? ORDER BY date DESC;
+
+selectEntriesForDate:
+SELECT * FROM HabitEntryEntity WHERE habit_id = ? AND date = ?;
+
+insertEntry:
+INSERT INTO HabitEntryEntity(id, habit_id, date, count, note) VALUES (?, ?, ?, ?, ?);
+
+deleteEntry:
+DELETE FROM HabitEntryEntity WHERE id = ?;
+
+deleteEntriesForHabit:
+DELETE FROM HabitEntryEntity WHERE habit_id = ?;
